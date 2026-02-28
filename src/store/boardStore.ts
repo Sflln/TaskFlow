@@ -1,5 +1,7 @@
 import { create } from 'zustand'
-import { nanoid } from 'nanoid'
+
+// Simple ID generator
+const genId = () => Date.now().toString(36) + Math.random().toString(36).substr(2)
 
 export type Task = {
   id: string
@@ -32,6 +34,10 @@ type BoardState = {
   addTask: (boardId: string, columnId: string, title: string, assignee?: string) => void
   moveTask: (boardId: string, fromColumnId: string, toColumnId: string, taskId: string, toIndex?: number) => void
   assignAdmin: (boardId: string, email: string) => void
+  deleteTask: (boardId: string, taskId: string) => void
+  deleteColumn: (boardId: string, columnId: string) => void
+  updateColumn: (boardId: string, columnId: string, patch: Partial<Column>) => void
+  updateTask: (boardId: string, taskId: string, patch: Partial<Task>) => void
 }
 
 const STORAGE_KEY = 'taskflow_boards'
@@ -56,11 +62,11 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   boards: load(),
 
   createBoard: (name, ownerEmail) => {
-    const id = nanoid()
+    const id = genId()
     const defaultCols: Column[] = [
-      { id: nanoid(), name: 'To Do', color: '#F3F4F6', taskIds: [] },
-      { id: nanoid(), name: 'In Progress', color: '#EFF6FF', taskIds: [] },
-      { id: nanoid(), name: 'Done', color: '#ECFDF5', taskIds: [] },
+      { id: genId(), name: 'To Do', color: '#F3F4F6', taskIds: [] },
+      { id: genId(), name: 'In Progress', color: '#EFF6FF', taskIds: [] },
+      { id: genId(), name: 'Done', color: '#ECFDF5', taskIds: [] },
     ]
     const board: Board = { id, name, columns: defaultCols, tasks: {}, admins: ownerEmail ? [ownerEmail] : [] }
     const boards = [...get().boards, board]
@@ -82,7 +88,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   addColumn: (boardId, name, color) => {
     const boards = get().boards.map((b) => {
       if (b.id !== boardId) return b
-      const col: Column = { id: nanoid(), name, color: color || '#FFFFFF', taskIds: [] }
+      const col: Column = { id: genId(), name, color: color || '#FFFFFF', taskIds: [] }
       return { ...b, columns: [...b.columns, col] }
     })
     set({ boards })
@@ -92,7 +98,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   addTask: (boardId, columnId, title, assignee) => {
     const boards = get().boards.map((b) => {
       if (b.id !== boardId) return b
-      const id = nanoid()
+      const id = genId()
       const task: Task = { id, title, assignee }
       const tasks = { ...b.tasks, [id]: task }
       const columns = b.columns.map((c) => (c.id === columnId ? { ...c, taskIds: [...c.taskIds, id] } : c))
@@ -123,6 +129,52 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
   assignAdmin: (boardId, email) => {
     const boards = get().boards.map((b) => (b.id === boardId ? { ...b, admins: Array.from(new Set([...b.admins, email])) } : b))
+    set({ boards })
+    save(boards)
+  },
+
+  deleteTask: (boardId: string, taskId: string) => {
+    const boards = get().boards.map((b) => {
+      if (b.id !== boardId) return b
+      const { [taskId]: _, ...tasks } = b.tasks
+      const columns = b.columns.map((c) => ({ ...c, taskIds: c.taskIds.filter((id) => id !== taskId) }))
+      return { ...b, tasks, columns }
+    })
+    set({ boards })
+    save(boards)
+  },
+
+  deleteColumn: (boardId: string, columnId: string) => {
+    const boards = get().boards.map((b) => {
+      if (b.id !== boardId) return b
+      const col = b.columns.find((c) => c.id === columnId)
+      if (!col) return b
+      // remove all tasks in column
+      const tasks = { ...b.tasks }
+      col.taskIds.forEach((tid) => delete tasks[tid])
+      const columns = b.columns.filter((c) => c.id !== columnId)
+      return { ...b, tasks, columns }
+    })
+    set({ boards })
+    save(boards)
+  },
+
+  updateColumn: (boardId: string, columnId: string, patch: Partial<Column>) => {
+    const boards = get().boards.map((b) => {
+      if (b.id !== boardId) return b
+      const columns = b.columns.map((c) => (c.id === columnId ? { ...c, ...patch } : c))
+      return { ...b, columns }
+    })
+    set({ boards })
+    save(boards)
+  },
+
+  updateTask: (boardId: string, taskId: string, patch: Partial<Task>) => {
+    const boards = get().boards.map((b) => {
+      if (b.id !== boardId) return b
+      const tasks = { ...b.tasks, [taskId]: { ...b.tasks[taskId], ...patch } }
+      return { ...b, tasks }
+    })
     set({ boards })
     save(boards)
   },
