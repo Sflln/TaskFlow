@@ -64,9 +64,9 @@ export const useBoardStore = create<BoardState>((set, get) => ({
   createBoard: (name, ownerEmail) => {
     const id = genId()
     const defaultCols: Column[] = [
-      { id: genId(), name: 'To Do', color: '#F3F4F6', taskIds: [] },
-      { id: genId(), name: 'In Progress', color: '#EFF6FF', taskIds: [] },
-      { id: genId(), name: 'Done', color: '#ECFDF5', taskIds: [] },
+      { id: genId(), name: 'Запланировано', color: '#F3F4F6', taskIds: [] },
+      { id: genId(), name: 'В процессе', color: '#EFF6FF', taskIds: [] },
+      { id: genId(), name: 'Выполнено', color: '#ECFDF5', taskIds: [] },
     ]
     const board: Board = { id, name, columns: defaultCols, tasks: {}, admins: ownerEmail ? [ownerEmail] : [] }
     const boards = [...get().boards, board]

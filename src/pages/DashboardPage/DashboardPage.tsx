@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useBoardStore } from '../../store/boardStore'
 import { useAuthStore } from '../../store/authStore'
+import { UserHeader } from '../../shared/UserHeader'
 import './DashboardPage.css'
 
 export const DashboardPage = () => {
@@ -13,7 +14,7 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     if (!boards.length && user) {
-      createBoard('General', user.email)
+      createBoard('Новая', user.email)
     }
   }, [])
 
@@ -25,26 +26,29 @@ export const DashboardPage = () => {
   }
 
   return (
-    <div className="dashboard-wrap">
-      <div className="dashboard-header">
-        <h1>Boards</h1>
-        <div>
-          <input className="board-name-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="New board name" />
-          <button className="btn-primary" onClick={handleCreate} style={{ marginLeft: 8 }}>Create</button>
+    <>
+      <UserHeader />
+      <div className="dashboard-wrap">
+        <div className="dashboard-header">
+          <h1>Мои доски</h1>
+          <div>
+            <input className="board-name-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Название новой доски" />
+            <button className="btn-primary" onClick={handleCreate} style={{ marginLeft: 8 }}>Создать</button>
+          </div>
+        </div>
+
+        <div className="boards-grid">
+          {boards.map((b) => (
+            <div key={b.id} className="board-card">
+              <h3 style={{ margin: 0 }}>{b.name}</h3>
+              <p style={{ color: '#95999C', marginTop: 6 }}>{b.columns.length} колонок</p>
+              <div style={{ marginTop: 12 }}>
+                <Link to={`/board/${b.id}`}>Открыть</Link>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-
-      <div className="boards-grid">
-        {boards.map((b) => (
-          <div key={b.id} className="board-card">
-            <h3 style={{ margin: 0 }}>{b.name}</h3>
-            <p style={{ color: '#95999C', marginTop: 6 }}>{b.columns.length} columns</p>
-            <div style={{ marginTop: 12 }}>
-              <Link to={`/board/${b.id}`}>Open</Link>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    </>
   )
 }

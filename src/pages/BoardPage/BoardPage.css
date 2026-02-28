@@ -1,5 +1,5 @@
 .board-page {
-  min-height: 100vh;
+  min-height: calc(100vh - 61px);
   background: #EFF2F9;
   padding: 24px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -162,12 +162,17 @@
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .add-task-form input {
   width: 100%;
-  padding: 8px 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
   border: 1px solid #95999C;
+  text-align: center;
   border-radius: 6px;
   font-size: 13px;
   font-family: inherit;
@@ -182,7 +187,6 @@
 
 .add-task-form button {
   width: 100%;
-  padding: 6px;
   background: #6A74C9;
   color: #FFFFFF;
   border: none;
