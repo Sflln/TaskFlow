@@ -15,59 +15,56 @@ The React Compiler is not enabled on this template because of its impact on dev 
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# TaskFlow
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+TaskFlow — простой и красивый локальный Kanban для личного использования и прототипирования рабочих процессов.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Почему TaskFlow
+- Лёгкий и быстрый старт — ничего не надо поднимать, всё хранится в браузере.
+- Инструменты для создания досок, колонок, задач и управления правами доступа (встроенная заглушка приглашений).
+- Хорошая база для дальнейшего развития: можно подключить бэкенд, синхронизацию и разграничение прав.
+
+Стек
+- React + TypeScript
+- Vite
+- Zustand (локальный стейт)
+- React Router
+- Чистый CSS (по компонентам)
+
+Функции
+- Аутентификация (регистрация/вход) — данные хранятся в `localStorage`
+- Доски (Boards): создание, просмотр и редактирование
+- Колонки и задачи: добавление, удаление, перетаскивание (drag & drop)
+- Права доступа: владелец доски + администраторы; зрители могут запросить права
+- Приглашение по ссылке: при открытии ссылки пользователь получает права администратора (заглушка)
+- Настройки доски: поменять название, цвет фона, тёмную тему, управлять администраторами
+- Редактирование профиля: имя, аватар, биография
+
+Ключевые файлы
+- `src/store/authStore.ts` — управление пользователем
+- `src/store/boardStore.ts` — логика досок, колонок, задач и прав
+- `src/pages/DashboardPage` — главный экран со списком досок
+- `src/pages/BoardPage` — интерфейс доски, колонки, таски
+- `src/shared` — общие компоненты: хедер, модалки, профиль, приглашения
+
+Установка и запуск
+1. Установите Node.js (рекомендую 16+).
+2. В папке проекта установите зависимости:
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+3. Запустите дев-сервер:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+4. Откройте адрес, который выведет Vite (обычно `http://localhost:5173`).
+
+Примечания
+- Данные приложения сохраняются в `localStorage` (ключи: `user`, `taskflow_boards`).
+- При первом запуске создаются две доски: одна — ваша (владелец), вторая — чужая (для тестирования прав).
+- Механика приглашений реализована как заглушка: при запросе/открытии приглашения права выдаются автоматически.
+
