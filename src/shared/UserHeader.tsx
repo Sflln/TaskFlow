@@ -26,38 +26,38 @@ export const UserHeader = () => {
           <button className="user-avatar-btn" onClick={() => setShowProfile(!showProfile)} title={user?.email}>
             <img src={user?.avatar} alt={user?.name} className="avatar-img" />
           </button>
+
+          {showProfile && (
+            <div className="profile-dropdown">
+              <div className="profile-header">
+                <img src={user?.avatar} alt={user?.name} className="profile-avatar" />
+                <div className="profile-info">
+                  <div className="profile-name">{user?.name}</div>
+                  <div className="profile-email">{user?.email}</div>
+                </div>
+              </div>
+
+              <div className="profile-divider" />
+
+              <button 
+                className="profile-action" 
+                onClick={() => { 
+                  setShowProfile(false)
+                  setShowModal(true)
+                }}
+              >
+                ⚙️ Редактировать профиль
+              </button>
+
+              <div className="profile-divider" />
+
+              <button className="profile-logout" onClick={handleLogout}>
+                🚪 Выйти
+              </button>
+            </div>
+          )}
         </div>
       </header>
-
-      {showProfile && (
-        <div className="profile-dropdown">
-          <div className="profile-header">
-            <img src={user?.avatar} alt={user?.name} className="profile-avatar" />
-            <div className="profile-info">
-              <div className="profile-name">{user?.name}</div>
-              <div className="profile-email">{user?.email}</div>
-            </div>
-          </div>
-
-          <div className="profile-divider" />
-
-          <button 
-            className="profile-action" 
-            onClick={() => { 
-              setShowProfile(false)
-              setShowModal(true)
-            }}
-          >
-            ⚙️ Редактировать профиль
-          </button>
-
-          <div className="profile-divider" />
-
-          <button className="profile-logout" onClick={handleLogout}>
-            🚪 Выйти
-          </button>
-        </div>
-      )}
 
       <ProfileModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </>

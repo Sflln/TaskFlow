@@ -23,6 +23,9 @@ export type Board = {
   columns: Column[]
   tasks: Record<string, Task>
   admins: string[] // emails
+  ownerEmail?: string
+  color?: string
+  darkMode?: boolean
 }
 
 type BoardState = {
@@ -34,6 +37,8 @@ type BoardState = {
   addTask: (boardId: string, columnId: string, title: string, assignee?: string) => void
   moveTask: (boardId: string, fromColumnId: string, toColumnId: string, taskId: string, toIndex?: number) => void
   assignAdmin: (boardId: string, email: string) => void
+  requestAdmin: (boardId: string, email: string) => void
+  removeAdmin: (boardId: string, email: string) => void
   deleteTask: (boardId: string, taskId: string) => void
   deleteColumn: (boardId: string, columnId: string) => void
   updateColumn: (boardId: string, columnId: string, patch: Partial<Column>) => void
@@ -68,7 +73,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
       { id: genId(), name: 'В процессе', color: '#EFF6FF', taskIds: [] },
       { id: genId(), name: 'Выполнено', color: '#ECFDF5', taskIds: [] },
     ]
-    const board: Board = { id, name, columns: defaultCols, tasks: {}, admins: ownerEmail ? [ownerEmail] : [] }
+    const board: Board = { id, name, columns: defaultCols, tasks: {}, admins: ownerEmail ? [ownerEmail] : [], ownerEmail, color: '#FFFFFF', darkMode: false }
     const boards = [...get().boards, board]
     set({ boards })
     save(boards)
@@ -129,6 +134,23 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
   assignAdmin: (boardId, email) => {
     const boards = get().boards.map((b) => (b.id === boardId ? { ...b, admins: Array.from(new Set([...b.admins, email])) } : b))
+    set({ boards })
+    save(boards)
+  },
+
+  // Stub: requestAdmin auto-assigns admin rights
+  requestAdmin: (boardId, email) => {
+    const boards = get().boards.map((b) => (b.id === boardId ? { ...b, admins: Array.from(new Set([...b.admins, email])) } : b))
+    set({ boards })
+    save(boards)
+  },
+
+  removeAdmin: (boardId: string, email: string) => {
+    const boards = get().boards.map((b) => {
+      if (b.id !== boardId) return b
+      if (b.ownerEmail === email) return b // owner cannot be removed
+      return { ...b, admins: b.admins.filter((e) => e !== email) }
+    })
     set({ boards })
     save(boards)
   },

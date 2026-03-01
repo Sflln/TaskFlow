@@ -238,3 +238,32 @@
     flex: 0 0 250px;
   }
 }
+
+/* dark mode overrides */
+.board-page.dark {
+  color: #FFF;
+}
+
+.board-page.dark .board-page-header h2,
+.board-page.dark .board-page-header a {
+  color: #FFF;
+}
+
+.board-page.dark .column {
+  background: #333;
+  border-color: #555;
+}
+
+.board-page.dark .column-header h4 {
+  color: #FFF;
+}
+
+.board-page.dark .task-card {
+  background: #444;
+  border-color: #666;
+  color: #FFF;
+}
+
+.board-page.dark .add-task-form button {
+  background: #4B4988;
+}

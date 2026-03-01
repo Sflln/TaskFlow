@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuthStore, type User } from '../store/authStore'
+import { useAuthStore } from '../store/authStore'
 import './ProfileModal.css'
 
 interface ProfileModalProps {
